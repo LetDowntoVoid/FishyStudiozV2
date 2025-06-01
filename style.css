@@ -683,6 +683,19 @@ body.freeze-scroll {
     display: none;
 }
 
+ .scrollText {
+    font-family: "HKGroteskWide", sans-serif;
+    font-size: clamp(20px, 18vw, 225px);
+    font-weight: 700;
+    width: 100dvw;
+    height: 500dvh;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 80%;
+}
 
 #showcase{
     width: 100dvw;
@@ -691,5 +704,26 @@ body.freeze-scroll {
 
 #scrollingText{
     position:absolute;
-    z-index: 10001;
 }
+
+.scrollText.behind {
+    z-index: 5;
+}
+
+.scrollText.front {
+    z-index: 10000;
+}
+
+.font_wire {
+    position: absolute;
+    z-index: 10001;
+    color: transparent;
+    -webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
+}
+
+.scrollText:nth-child(1) { top: 0%; }
+.scrollText:nth-child(2) { top: 16.66%; }
+.scrollText:nth-child(3) { top: 33.33%; }
+.scrollText:nth-child(4) { top: 50%; }
+.scrollText:nth-child(5) { top: 66.66%; }
+.scrollText:nth-child(6) { top: 83.33%; }
