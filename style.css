@@ -697,28 +697,69 @@ body.freeze-scroll {
     line-height: 80%;
 }
 
-#showcase{
+#about_game {
+    position: fixed;
+    background: var(--theRed);
+    width: 100dvw;
+    height: 100dvh;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.scrollText {
+    font-family: "HKGroteskWide", sans-serif;
+    font-size: clamp(16px, 12vw, 225px);
+    font-weight: 700;
+    width: 100dvw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 80%;
+    padding: 0 5vw;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#showcase {
     width: 100dvw;
     height: 500dvh;
 }
 
-#scrollingText{
-    position:absolute;
+#scrollingText {
+    position: absolute;
 }
 
 .scrollText.behind {
     z-index: 5;
+    max-width: 95dvw;
 }
 
 .scrollText.front {
     z-index: 10000;
+    max-width: 95dvw;
 }
 
 .font_wire {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 10001;
     color: transparent;
-    -webkit-text-stroke: 5px rgba(255, 255, 255, 0.8);
+    -webkit-text-stroke: 3px rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    line-height: inherit;
+    padding: inherit;
 }
 
 .scrollText:nth-child(1) { top: 0%; }
@@ -727,3 +768,149 @@ body.freeze-scroll {
 .scrollText:nth-child(4) { top: 50%; }
 .scrollText:nth-child(5) { top: 66.66%; }
 .scrollText:nth-child(6) { top: 83.33%; }
+
+#contacts {
+    padding-top: 10dvh;
+    height: max-content;
+    padding-bottom: 15dvh;
+    z-index: 2;
+}
+
+.lowGlore {
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.8), transparent, transparent);
+    pointer-events: none;
+    z-index: 10001;
+    position: absolute;
+    bottom: 0;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+    .scrollText {
+        font-size: clamp(14px, 10vw, 80px);
+        padding: 0 3vw;
+        line-height: 85%;
+    }
+    
+    .scrollText.behind,
+    .scrollText.front {
+        max-width: 94vw;
+    }
+    
+    .font_wire {
+        -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8);
+    }
+    
+    #contacts {
+        padding-top: 8dvh;
+        padding-bottom: 12dvh;
+    }
+}
+
+@media (max-width: 480px) {
+    .scrollText {
+        font-size: clamp(12px, 8vw, 60px);
+        padding: 0 2vw;
+        line-height: 90%;
+    }
+    
+    .font_wire {
+        -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.8);
+    }
+    
+    #contacts {
+        padding-top: 6dvh;
+        padding-bottom: 10dvh;
+    }
+}
+
+
+#footer-3d-container{
+    background: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(8, 8, 8, 1), transparent);
+    z-index: 1;
+}
+
+.blur_overlay_footer{
+    backdrop-filter:blur(1.25px);
+    position: absolute;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+.logos{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: center;
+    gap: 10px;
+    padding: 10px;
+    flex-direction: row;
+    width: 100%;
+    height: max-content;
+
+}
+
+.logos > div{
+    height: 50%;
+    width: 2px;
+    background-color: white;
+    mix-blend-mode: differences;
+}
+
+.logos > img{
+    max-width: 30dvw;
+}
+
+.blur_overlay_footer > .info{
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 10px;
+    width: 100dvw;
+}
+.blur_overlay_footer > .info > span{
+    width: 100dvw;
+}
+
+.blur_overlay_footer > .info > span > a{
+    color: var(--theRed);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.ending{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.coolAhhCR{
+    font-family: "HKGroteskWide", sans-serif;
+    font-weight: 900;
+    color: rgb(0, 0, 0);
+    font-size: clamp(40px, 12vw, 140px);
+    text-size-adjust: 50%;
+    letter-spacing: -0.2em;
+    -webkit-text-stroke: 5px var(--backgroundBlack);
+    height: clamp(40px, 12vw, 140px);
+}
+
+.ending{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.cright{
+    display: flex;
+    gap:50px;
+    justify-content: center;
+    align-items: center;
+    font-family: "Montserrat", sans-serif;
+}
