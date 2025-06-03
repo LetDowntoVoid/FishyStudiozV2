@@ -108,52 +108,92 @@ class OptimizedThreeJSLoader {
     }
 
     setupRenderer() {
-        const isMobile = this.isMobile();
-        const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
-        this.renderer = new THREE.WebGLRenderer({
-            antialias: !isMobile && pixelRatio < 2,
-            alpha: true,
-            powerPreference: isMobile ? "low-power" : "high-performance",
-            stencil: false,
-            depth: true,
-            preserveDrawingBuffer: false // Prevent memory leaks on mobile
-        });
-        this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
-        this.renderer.setPixelRatio(pixelRatio);
-        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.shadowMap.enabled = !isMobile;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = isMobile ? 1.1 : 1.5;
-        this.renderer.info.autoReset = false;
-        this.canvasContainer.appendChild(this.renderer.domElement);
-        // Listen for context loss and restore
-        this.renderer.domElement.addEventListener('webglcontextlost', (e) => {
-            e.preventDefault();
-            console.warn('WebGL context lost. Attempting to recover...');
-            this.handleContextLoss();
-        }, false);
-        this.renderer.domElement.addEventListener('webglcontextrestored', () => {
-            console.warn('WebGL context restored. Re-initializing scene...');
-            this.handleContextRestore();
-        }, false);
+        // Aggressively dispose previous renderer and canvas if they exist
+        if (this.renderer) {
+            try {
+                if (this.renderer.forceContextLoss) this.renderer.forceContextLoss();
+                this.renderer.dispose();
+            } catch (e) {
+                console.warn('Renderer dispose error:', e);
+            }
+            if (this.renderer.domElement && this.renderer.domElement.parentNode) {
+                this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+            }
+            this.renderer = null;
+        }
+
+        // Try-catch to handle WebGL context creation errors
+        try {
+            const isMobile = this.isMobile();
+            const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+            this.renderer = new THREE.WebGLRenderer({
+                antialias: !isMobile && pixelRatio < 2,
+                alpha: true,
+                powerPreference: isMobile ? "low-power" : "high-performance",
+                stencil: false,
+                depth: true,
+                preserveDrawingBuffer: false // Prevent memory leaks on mobile
+            });
+            this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
+            this.renderer.setPixelRatio(pixelRatio);
+            this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+            this.renderer.shadowMap.enabled = !isMobile;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            this.renderer.toneMappingExposure = isMobile ? 1.1 : 1.5;
+            this.renderer.info.autoReset = false;
+            this.canvasContainer.appendChild(this.renderer.domElement);
+
+            // Listen for context loss and restore
+            this.renderer.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.warn('WebGL context lost. Attempting to recover...');
+                this.handleContextLoss();
+            }, false);
+            this.renderer.domElement.addEventListener('webglcontextrestored', () => {
+                console.warn('WebGL context restored. Re-initializing scene...');
+                this.handleContextRestore();
+            }, false);
+        } catch (err) {
+            // If context creation fails, clean up and show a user-friendly message
+            console.error('Error creating WebGL context:', err);
+            if (this.renderer && this.renderer.domElement && this.renderer.domElement.parentNode) {
+                this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+            }
+            this.renderer = null;
+            // Optionally, display a fallback message or image
+            if (this.canvasContainer) {
+                this.canvasContainer.innerHTML = '<div style="color:#b00;font-size:2em;text-align:center;padding:2em;">WebGL not supported or too many contexts in use.<br>Please close other tabs or restart your browser.</div>';
+            }
+        }
     }
 
     handleContextLoss() {
         // Aggressively dispose everything to free memory
-        this.disposeModel();
-        if (this.composer) {
-            this.composer.dispose();
-            this.composer = null;
-        }
-        if (this.renderer) {
-            this.renderer.dispose();
+        try {
+            this.disposeModel();
+            if (this.composer) {
+                this.composer.dispose();
+                this.composer = null;
+            }
+            if (this.renderer) {
+                if (this.renderer.forceContextLoss) this.renderer.forceContextLoss();
+                this.renderer.dispose();
+                if (this.renderer.domElement && this.renderer.domElement.parentNode) {
+                    this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+                }
+                this.renderer = null;
+            }
+        } catch (e) {
+            console.warn('Error during context loss cleanup:', e);
         }
         this.scene = null;
         this.camera = null;
         this.controls = null;
         this.isAnimating = false;
         this.rafId = null;
+        // Optionally, force garbage collection if available
+        if (window.gc) try { window.gc(); } catch (e) {}
     }
 
     handleContextRestore() {
@@ -819,10 +859,17 @@ class OptimizedThreeJSLoader {
             this.controls.update();
         }
         this.render();
-        this.renderer.info.reset();
+        if (this.renderer && this.renderer.info) this.renderer.info.reset();
+
+        // Aggressively free memory every 50 frames
+        this._frameCount = (this._frameCount || 0) + 1;
+        if (this._frameCount % 50 === 0) {
+            this.freeWebGLMemory();
+        }
     }
 
     render() {
+        if (!this.renderer || !this.scene || !this.camera) return;
         if (this.composer) {
             this.composer.render();
         } else {
@@ -924,6 +971,46 @@ class OptimizedThreeJSLoader {
         }
     }
 
+    cleanMaterial(material) {
+        if (!material) return;
+        material.dispose();
+        for (const key in material) {
+            const value = material[key];
+            // Texture objects in Three.js have minFilter property
+            if (value && typeof value === 'object' && 'minFilter' in value) {
+                value.dispose && value.dispose();
+            }
+        }
+    }
+
+    freeWebGLMemory() {
+        // Only aggressively clear memory on mobile devices
+        if (!this.isMobile()) return;
+
+        requestAnimationFrame(() => {
+            if (!this.scene || !this.renderer) return;
+            try {
+                this.scene.traverse(object => {
+                    if (!object.isMesh) return;
+                    if (object.geometry) object.geometry.dispose();
+                    if (object.material) {
+                        if (Array.isArray(object.material)) {
+                            object.material.forEach(mat => this.cleanMaterial(mat));
+                        } else {
+                            this.cleanMaterial(object.material);
+                        }
+                    }
+                });
+                if (this.renderer.renderLists) this.renderer.renderLists.dispose();
+                // Optionally, force garbage collection if available
+                if (window.gc) try { window.gc(); } catch (e) {}
+                console.log("WebGL memory aggressively cleared (mobile only)!");
+            } catch (e) {
+                console.warn("Error during WebGL memory cleanup:", e);
+            }
+        });
+    }
+
     dispose() {
         this.pauseAnimation();
         window.removeEventListener('scroll', this.throttledScroll);
@@ -934,7 +1021,16 @@ class OptimizedThreeJSLoader {
         }
         this.disposeModel();
         if (this.renderer) {
-            this.renderer.dispose();
+            try {
+                if (this.renderer.forceContextLoss) this.renderer.forceContextLoss();
+                this.renderer.dispose();
+            } catch (e) {
+                console.warn('Renderer dispose error:', e);
+            }
+            if (this.renderer.domElement && this.renderer.domElement.parentNode) {
+                this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+            }
+            this.renderer = null;
         }
         if (this.composer) {
             this.composer.dispose();
@@ -943,6 +1039,8 @@ class OptimizedThreeJSLoader {
         this.camera = null;
         this.renderer = null;
         this.controls = null;
+        // Optionally, force garbage collection if available
+        if (window.gc) try { window.gc(); } catch (e) {}
         console.log('Three.js loader disposed');
     }
 
