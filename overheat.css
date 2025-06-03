@@ -24,6 +24,11 @@ body{
     height: 100dvh;
 }
 
+.force-fullscreen{
+    width: 100dvw;
+    height: 100dvh;
+}
+
 .border{
     box-shadow: inset 0 0 0 4px var(--theRed);
 }
@@ -39,14 +44,15 @@ body{
     padding: 0;
     overflow-y: hidden;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
 }
 
 .drop-in-title{
     font-family: "HKGroteskWide", sans-serif;
     font-size: clamp(40px, 15vw, 250px);
-    overflow: hidden;
-    height: 100%;
-    padding-top: 0;
     position: absolute;
     line-height: 55%;
     padding-left: 5dvw;
@@ -83,7 +89,7 @@ body{
     display: flex;
     flex-direction: column;
     height: 80dvh;
-    padding-right: 280px; /* Make space for carousel */
+    padding-right: 280px;
 }
 
 .aboutusContent h2 {
@@ -110,7 +116,7 @@ body{
     font-size: clamp(1rem, 2.5vw, 1.8rem);
     line-height: 1;
     color: rgba(255, 255, 255, 0.8);
-    margin: 0 0 0.25em 0; /* Reduced bottom margin for less gap */
+    margin: 0 0 0.25em 0;
     display: block;
     font-family: "Montserrat", sans-serif;
     max-width: 50dvw;
@@ -298,32 +304,6 @@ body{
     color: rgba(255, 255, 255, 0.6);
 }
 
-@media (max-width: 768px) {
-    .about {
-        height: auto;
-        min-height: 60vh;
-    }
-
-    .aboutusContent {
-        padding: 30px 20px;
-        padding-right: 20px;
-    }
-
-    .devCarousel {
-        position: relative;
-        top: auto;
-        right: auto;
-        width: 100%;
-        height: 200px;
-        margin-top: 20px;
-        border-radius: 8px;
-    }
-
-    .aboutusContent h2 {
-        font-size: 2.5rem;
-    }
-}
-
 .games {
     max-width: 100dvw;
     margin: 0 auto;
@@ -339,7 +319,7 @@ body{
     display: flex;
     flex-direction: column;
     height: 80dvh;
-    padding-right: 280px; /* Make space for carousel */
+    padding-right: 280px;
 }
 
 .gamesContent h2 {
@@ -366,7 +346,7 @@ body{
     font-size: clamp(1rem, 2.5vw, 1.8rem);
     line-height: 1;
     color: rgba(255, 255, 255, 0.8);
-    margin: 0 0 0.25em 0; /* Reduced bottom margin for less gap */
+    margin: 0 0 0.25em 0;
     display: block;
     font-family: "Montserrat", sans-serif;
     max-width: 50dvw;
@@ -442,4 +422,330 @@ body{
 #overheat > p{
     display: block;
     color: var(--theRed)
+}
+
+@media (max-width: 1200px){
+    .border {
+        box-shadow: none;
+    }   
+}
+
+/* Tablets (768px and below) - This is where we switch to mobile layout */
+@media (max-width: 768px) {
+    .fullscreen{
+        width: 100dvw;
+        height: max-content;
+        padding-top: 10dvh;
+    }
+
+    .border {
+        box-shadow: none;
+    } 
+    
+    .about, .games {
+        border: none;
+    }
+    
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        border: none;
+    }
+    
+    .dev-avatar {
+        border: none;
+    }
+    
+    .nav-dot {
+        border: none;
+    }
+    
+    .carousel-arrows {
+        border: none;
+    }
+    
+    .drop-in {
+        width: 100vw;
+    }
+
+    .drop-in #logo {
+        width: 20vw;
+        top: 4vh;
+    }
+    
+    .drop-in-title {
+        padding-left: 2vw;
+        line-height: 60%;
+    }
+    
+    .about, .games {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .aboutusContent, .gamesContent {
+        padding: 25px 20px;
+        padding-right: 20px;
+        height: auto;
+        min-height: 60vh;
+        flex-direction: column;
+    }
+
+    .aboutusContent h2, .gamesContent h2 {
+        font-size: clamp(35px, 8vw, 70px);
+        margin-bottom: 5vh;
+        max-width: 100%;
+    }
+    
+    .aboutusContent p, .gamesContent p {
+        font-size: clamp(0.9rem, 3vw, 1.3rem);
+        max-width: 100%;
+        line-height: 1.4;
+        margin-bottom: 0.5em;
+    }
+
+    .devCarousel, .funnyCircle {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        height: 250px;
+        margin-top: 20px;
+    }
+    
+    #overheat, #ufg {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        height: 200px;
+        margin-top: 20px;
+    }
+
+    .dev-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .dev-name {
+        font-size: 0.9rem;
+    }
+    
+    .dev-description {
+        font-size: 0.75rem;
+    }
+    
+    .social-link {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+}
+
+/* Small tablets and large phones (600px and below) */
+@media (max-width: 600px) {
+    .fullscreen{
+        width: 100dvw;
+        height: max-content;
+        padding-top: 10dvh;
+    }
+
+    .border {
+        box-shadow: none;
+    } 
+    
+    .about, .games {
+        border: none;
+    }
+    
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        border: none;
+    }
+    
+    .dev-avatar {
+        border: none;
+    }
+    
+    .nav-dot {
+        border: none;
+    }
+    
+    .carousel-arrows {
+        border: none;
+    }
+    
+    .drop-in #logo {
+        width: 25vw;
+        top: 5vh;
+    }
+    
+    .drop-in-title {
+        padding-left: 1vw;
+        line-height: 65%;
+    }
+    
+    .drop-in-title span {
+        padding: 0 15px;
+        margin: 0 -15px;
+    }
+
+    .aboutusContent, .gamesContent {
+        padding: 20px 15px;
+        min-height: 50vh;
+    }
+
+    .aboutusContent h2, .gamesContent h2 {
+        font-size: clamp(28px, 7vw, 55px);
+        margin-bottom: 4vh;
+        line-height: 1.2;
+    }
+    
+    .aboutusContent p, .gamesContent p {
+        font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+        line-height: 1.5;
+    }
+
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        height: 220px;
+        margin-top: 15px;
+    }
+    
+    .dev-card {
+        padding: 10px;
+    }
+    
+    .carousel-arrows {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+    
+    .nav-dot {
+        width: 6px;
+        height: 6px;
+    }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+    .fullscreen{
+        width: 100dvw;
+        height: max-content;
+        padding-top: 10dvh;
+    }
+
+    .border {
+        box-shadow: none;  
+    } 
+    
+    .about, .games {
+        border: none;
+    }
+    
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        border: none;
+    }
+    
+    .dev-avatar {
+        border: none;
+    }
+    
+    .nav-dot {
+        border: none;
+    }
+    
+    .carousel-arrows {
+        border: none;
+    }
+    
+    .drop-in #logo {
+        width: 30vw;
+    }
+    
+    .drop-in-title {
+        padding-left: 0.5vw;
+    }
+
+    .aboutusContent, .gamesContent {
+        padding: 15px 10px;
+    }
+
+    .aboutusContent h2, .gamesContent h2 {
+        font-size: clamp(24px, 6vw, 45px);
+        margin-bottom: 3vh;
+    }
+    
+    .aboutusContent p, .gamesContent p {
+        font-size: clamp(0.8rem, 4vw, 1rem);
+        line-height: 1.6;
+    }
+
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        height: 180px;
+    }
+    
+    .dev-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .dev-name {
+        font-size: 0.8rem;
+    }
+    
+    .dev-description {
+        font-size: 0.7rem;
+    }
+    
+    .social-link {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+    
+    .carousel-arrows {
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .border {
+        box-shadow: none;
+    } 
+    
+    .about, .games {
+        border: none;
+    }
+    
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        border: none;
+    }
+    
+    .dev-avatar {
+        border: none;
+    }
+    
+    .nav-dot {
+        border: none;
+    }
+    
+    .carousel-arrows {
+        border: none;
+    }
+
+    .aboutusContent h2, .gamesContent h2 {
+        font-size: clamp(20px, 5.5vw, 35px);
+        margin-bottom: 2vh;
+    }
+    
+    .aboutusContent p, .gamesContent p {
+        font-size: clamp(0.75rem, 4.5vw, 0.9rem);
+    }
+
+    .devCarousel, .funnyCircle, #overheat, #ufg {
+        height: 160px;
+        margin-top: 10px;
+    }
+    
+    .dev-card {
+        padding: 8px;
+    }
 }
