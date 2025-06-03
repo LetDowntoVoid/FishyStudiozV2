@@ -108,21 +108,22 @@ class OptimizedThreeJSLoader {
     }
 
     setupRenderer() {
-        const pixelRatio = Math.min(window.devicePixelRatio, 2);
+        const isMobile = this.isMobile();
+        const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
         this.renderer = new THREE.WebGLRenderer({
-            antialias: pixelRatio < 2,
+            antialias: !isMobile && pixelRatio < 2,
             alpha: true,
-            powerPreference: "high-performance",
+            powerPreference: isMobile ? "low-power" : "high-performance",
             stencil: false,
             depth: true
         });
         this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
         this.renderer.setPixelRatio(pixelRatio);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = !isMobile;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.5;
+        this.renderer.toneMappingExposure = isMobile ? 1.1 : 1.5;
         this.renderer.info.autoReset = false;
         this.canvasContainer.appendChild(this.renderer.domElement);
     }
@@ -135,33 +136,37 @@ class OptimizedThreeJSLoader {
     }
 
     setupCamera() {
-        this.camera = new THREE.PerspectiveCamera(75, this.cachedAspectRatio, 0.1, 1000);
-        this.camera.position.set(0, 2, 5);
+        const isMobile = this.isMobile();
+        this.camera = new THREE.PerspectiveCamera(isMobile ? 65 : 75, this.cachedAspectRatio, 0.1, 1000);
+        this.camera.position.set(0, 2, isMobile ? 7 : 5);
         this.camera.matrixAutoUpdate = false;
         this.camera.updateMatrix();
     }
 
     setupLighting() {
+        const isMobile = this.isMobile();
         const lightGroup = new THREE.Group();
         lightGroup.name = 'LightGroup';
 
         // Neon Red Point Light (left/front, color #b21927)
-        const neonRedLight = new THREE.PointLight(0xb21927, 3.0, 30);
+        const neonRedLight = new THREE.PointLight(0xb21927, isMobile ? 1.2 : 3.0, 30);
         neonRedLight.position.set(-5, 6, 4);
         lightGroup.add(neonRedLight);
 
         // Neon Blue Point Light (right/front)
-        const neonBlueLight = new THREE.PointLight(0x0080ff, 3.0, 30);
+        const neonBlueLight = new THREE.PointLight(0x0080ff, isMobile ? 1.2 : 3.0, 30);
         neonBlueLight.position.set(5, 6, 4);
         lightGroup.add(neonBlueLight);
 
-        // Neon Purple Side Light (below and near blue)
-        const neonPurpleLight = new THREE.PointLight(0xb74aff, 2.0, 25);
-        neonPurpleLight.position.set(6, 3, 2);
-        lightGroup.add(neonPurpleLight);
+        if (!isMobile) {
+            // Neon Purple Side Light (below and near blue)
+            const neonPurpleLight = new THREE.PointLight(0xb74aff, 2.0, 25);
+            neonPurpleLight.position.set(6, 3, 2);
+            lightGroup.add(neonPurpleLight);
+        }
 
-        // Optionally, add a subtle fill to avoid total black shadows
-        const fillLight = new THREE.PointLight(0xffffff, 0.1, 100);
+        // Subtle fill
+        const fillLight = new THREE.PointLight(0xffffff, isMobile ? 0.05 : 0.1, 100);
         fillLight.position.set(0, 10, 0);
         lightGroup.add(fillLight);
 
@@ -183,12 +188,14 @@ class OptimizedThreeJSLoader {
     }
 
     isPostProcessingAvailable() {
+        if (this.isMobile()) return false;
         return typeof THREE.EffectComposer !== 'undefined' &&
                typeof THREE.RenderPass !== 'undefined' &&
                typeof THREE.ShaderPass !== 'undefined';
     }
 
     setupPostProcessing() {
+        if (this.isMobile()) return; // Disable post-processing on mobile
         this.composer = new THREE.EffectComposer(this.renderer);
         this.renderPass = new THREE.RenderPass(this.scene, this.camera);
         this.composer.addPass(this.renderPass);
