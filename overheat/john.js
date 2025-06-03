@@ -284,6 +284,12 @@ class OptimizedThreeJSLoader {
                 this.isVisible = entry.isIntersecting;
                 if (!this.isVisible && this.rafId) {
                     this.pauseAnimation();
+                    if (this.isMobile()) {
+                        this.disposeModel();
+                        if (this.renderer) {
+                            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
+                        }
+                    }
                 } else if (this.isVisible && !this.rafId) {
                     this.resumeAnimation();
                 }
@@ -318,6 +324,12 @@ class OptimizedThreeJSLoader {
     handleVisibilityChange() {
         if (document.hidden) {
             this.pauseAnimation();
+            if (this.isMobile()) {
+                this.disposeModel();
+                if (this.renderer) {
+                    this.renderer.forceContextLoss && this.renderer.forceContextLoss();
+                }
+            }
         } else {
             this.resumeAnimation();
         }
@@ -866,6 +878,7 @@ class OptimizedThreeJSLoader {
         console.log(`Buffer scroll height set to: ${vh}vh`);
     }
 
+    // --- MOBILE MEMORY OPTIMIZATION ---
     disposeModel() {
         if (this.model) {
             // Stop and reset all animation actions before disposing
@@ -889,12 +902,42 @@ class OptimizedThreeJSLoader {
                         child.material.dispose();
                     }
                 }
+                // Remove textures from memory
+                if (child.material && child.material.map) {
+                    child.material.map.dispose();
+                    child.material.map = null;
+                }
+                if (child.material && child.material.normalMap) {
+                    child.material.normalMap.dispose();
+                    child.material.normalMap = null;
+                }
+                if (child.material && child.material.roughnessMap) {
+                    child.material.roughnessMap.dispose();
+                    child.material.roughnessMap = null;
+                }
+                if (child.material && child.material.metalnessMap) {
+                    child.material.metalnessMap.dispose();
+                    child.material.metalnessMap = null;
+                }
+                if (child.material && child.material.bumpMap) {
+                    child.material.bumpMap.dispose();
+                    child.material.bumpMap = null;
+                }
+                if (child.material && child.material.emissiveMap) {
+                    child.material.emissiveMap.dispose();
+                    child.material.emissiveMap = null;
+                }
             });
             this.scene.remove(this.model);
             this.model = null;
+            // Force GC hint for mobile browsers
+            if (this.isMobile() && window.gc) {
+                window.gc();
+            }
         }
     }
 
+    // --- MOBILE RENDERER MEMORY OPTIMIZATION ---
     dispose() {
         this.pauseAnimation();
         window.removeEventListener('scroll', this.throttledScroll);
@@ -905,41 +948,70 @@ class OptimizedThreeJSLoader {
         }
         this.disposeModel();
         if (this.renderer) {
+            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
             this.renderer.dispose();
+            this.renderer.domElement = null;
+            this.renderer = null;
         }
         if (this.composer) {
             this.composer.dispose();
+            this.composer = null;
         }
         this.scene = null;
         this.camera = null;
-        this.renderer = null;
         this.controls = null;
+        // Remove canvas from DOM
+        if (this.canvasContainer && this.canvasContainer.parentNode) {
+            this.canvasContainer.parentNode.removeChild(this.canvasContainer);
+        }
+        // Force GC hint for mobile browsers
+        if (this.isMobile() && window.gc) {
+            window.gc();
+        }
         console.log('Three.js loader disposed');
     }
 
-    getPerformanceInfo() {
-        if (!this.renderer) return null;
-        return {
-            render: this.renderer.info.render,
-            memory: this.renderer.info.memory,
-            fps: this.getFPS()
-        };
+    // --- MOBILE: AGGRESSIVE CLEANUP ON VISIBILITY CHANGE ---
+    handleVisibilityChange() {
+        if (document.hidden) {
+            this.pauseAnimation();
+            if (this.isMobile()) {
+                this.disposeModel();
+                if (this.renderer) {
+                    this.renderer.forceContextLoss && this.renderer.forceContextLoss();
+                }
+            }
+        } else {
+            this.resumeAnimation();
+        }
     }
 
-    getFPS() {
-        if (!this.fpsCounter) {
-            this.fpsCounter = { frames: 0, time: Date.now() };
+    // --- MOBILE: AGGRESSIVE CLEANUP ON SCROLL OUT OF VIEW ---
+    setupIntersectionObserver() {
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0
+        };
+        this.intersectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                this.isVisible = entry.isIntersecting;
+                if (!this.isVisible && this.rafId) {
+                    this.pauseAnimation();
+                    if (this.isMobile()) {
+                        this.disposeModel();
+                        if (this.renderer) {
+                            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
+                        }
+                    }
+                } else if (this.isVisible && !this.rafId) {
+                    this.resumeAnimation();
+                }
+            });
+        }, options);
+        if (this.canvasContainer) {
+            this.intersectionObserver.observe(this.canvasContainer);
         }
-        this.fpsCounter.frames++;
-        const now = Date.now();
-        const delta = now - this.fpsCounter.time;
-        if (delta >= 1000) {
-            const fps = Math.round((this.fpsCounter.frames * 1000) / delta);
-            this.fpsCounter.frames = 0;
-            this.fpsCounter.time = now;
-            return fps;
-        }
-        return null;
     }
 }
 
