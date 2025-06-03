@@ -670,3 +670,45 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('ESC or leave games area to return to default');
 });
 
+
+async function sendEmail(formData) {
+  try {
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log('Email sent successfully:', result);
+      return { success: true, data: result };
+    } else {
+      console.error('Error sending email:', result.error);
+      return { success: false, error: result.error };
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    return { success: false, error: 'Network error' };
+  }
+}
+
+const exampleUsage = async () => {
+  const testData = {
+    name: "John Doe",
+    email: "john@example.com",
+    subject: "Test Message",
+    message: "This is a test message from the contact form."
+  };
+
+  const result = await sendEmail(testData);
+  console.log(result);
+};
