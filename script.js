@@ -701,14 +701,16 @@ async function sendEmail(formData) {
   }
 }
 
-const exampleUsage = async () => {
-  const testData = {
+
+async function test() {
+    const testData = {
     name: "John Doe",
     email: "john@example.com",
     subject: "Test Message",
     message: "This is a test message from the contact form."
-  };
-
-  const result = await sendEmail(testData);
-  console.log(result);
 };
+
+    const result = await sendEmail(testData);
+    console.log(result);
+}
+test();
