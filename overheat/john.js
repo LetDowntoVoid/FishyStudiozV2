@@ -108,23 +108,59 @@ class OptimizedThreeJSLoader {
     }
 
     setupRenderer() {
-        const pixelRatio = Math.min(window.devicePixelRatio, 2);
+        const isMobile = this.isMobile();
+        const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
         this.renderer = new THREE.WebGLRenderer({
-            antialias: pixelRatio < 2,
+            antialias: !isMobile && pixelRatio < 2,
             alpha: true,
-            powerPreference: "low-power",
+            powerPreference: isMobile ? "low-power" : "high-performance",
             stencil: false,
-            depth: true
+            depth: true,
+            preserveDrawingBuffer: false // Prevent memory leaks on mobile
         });
         this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
         this.renderer.setPixelRatio(pixelRatio);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = !isMobile;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.5;
+        this.renderer.toneMappingExposure = isMobile ? 1.1 : 1.5;
         this.renderer.info.autoReset = false;
         this.canvasContainer.appendChild(this.renderer.domElement);
+        // Listen for context loss and restore
+        this.renderer.domElement.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            console.warn('WebGL context lost. Attempting to recover...');
+            this.handleContextLoss();
+        }, false);
+        this.renderer.domElement.addEventListener('webglcontextrestored', () => {
+            console.warn('WebGL context restored. Re-initializing scene...');
+            this.handleContextRestore();
+        }, false);
+    }
+
+    handleContextLoss() {
+        // Aggressively dispose everything to free memory
+        this.disposeModel();
+        if (this.composer) {
+            this.composer.dispose();
+            this.composer = null;
+        }
+        if (this.renderer) {
+            this.renderer.dispose();
+        }
+        this.scene = null;
+        this.camera = null;
+        this.controls = null;
+        this.isAnimating = false;
+        this.rafId = null;
+    }
+
+    handleContextRestore() {
+        // Re-initialize the scene after context restore
+        setTimeout(() => {
+            this.init();
+        }, 100);
     }
 
     setupScene() {
