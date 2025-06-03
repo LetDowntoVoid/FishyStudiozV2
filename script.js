@@ -705,7 +705,7 @@ async function sendEmail(formData) {
 async function test() {
     const testData = {
     name: "John Doe",
-    email: "john@example.com",
+    email: "sreyam.bhattacharjee@gmail.com",
     subject: "Test Message",
     message: "This is a test message from the contact form."
 };
