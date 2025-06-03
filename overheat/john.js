@@ -108,22 +108,21 @@ class OptimizedThreeJSLoader {
     }
 
     setupRenderer() {
-        const isMobile = this.isMobile();
-        const pixelRatio = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+        const pixelRatio = Math.min(window.devicePixelRatio, 2);
         this.renderer = new THREE.WebGLRenderer({
-            antialias: !isMobile && pixelRatio < 2,
+            antialias: pixelRatio < 2,
             alpha: true,
-            powerPreference: isMobile ? "low-power" : "high-performance",
+            powerPreference: "low-power",
             stencil: false,
             depth: true
         });
         this.renderer.setSize(this.cachedDimensions.width, this.cachedDimensions.height);
         this.renderer.setPixelRatio(pixelRatio);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.shadowMap.enabled = !isMobile;
+        this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = isMobile ? 1.1 : 1.5;
+        this.renderer.toneMappingExposure = 1.5;
         this.renderer.info.autoReset = false;
         this.canvasContainer.appendChild(this.renderer.domElement);
     }
@@ -136,37 +135,33 @@ class OptimizedThreeJSLoader {
     }
 
     setupCamera() {
-        const isMobile = this.isMobile();
-        this.camera = new THREE.PerspectiveCamera(isMobile ? 65 : 75, this.cachedAspectRatio, 0.1, 1000);
-        this.camera.position.set(0, 2, isMobile ? 7 : 5);
+        this.camera = new THREE.PerspectiveCamera(75, this.cachedAspectRatio, 0.1, 1000);
+        this.camera.position.set(0, 2, 5);
         this.camera.matrixAutoUpdate = false;
         this.camera.updateMatrix();
     }
 
     setupLighting() {
-        const isMobile = this.isMobile();
         const lightGroup = new THREE.Group();
         lightGroup.name = 'LightGroup';
 
         // Neon Red Point Light (left/front, color #b21927)
-        const neonRedLight = new THREE.PointLight(0xb21927, isMobile ? 1.2 : 3.0, 30);
+        const neonRedLight = new THREE.PointLight(0xb21927, 3.0, 30);
         neonRedLight.position.set(-5, 6, 4);
         lightGroup.add(neonRedLight);
 
         // Neon Blue Point Light (right/front)
-        const neonBlueLight = new THREE.PointLight(0x0080ff, isMobile ? 1.2 : 3.0, 30);
+        const neonBlueLight = new THREE.PointLight(0x0080ff, 3.0, 30);
         neonBlueLight.position.set(5, 6, 4);
         lightGroup.add(neonBlueLight);
 
-        if (!isMobile) {
-            // Neon Purple Side Light (below and near blue)
-            const neonPurpleLight = new THREE.PointLight(0xb74aff, 2.0, 25);
-            neonPurpleLight.position.set(6, 3, 2);
-            lightGroup.add(neonPurpleLight);
-        }
+        // Neon Purple Side Light (below and near blue)
+        const neonPurpleLight = new THREE.PointLight(0xb74aff, 2.0, 25);
+        neonPurpleLight.position.set(6, 3, 2);
+        lightGroup.add(neonPurpleLight);
 
-        // Subtle fill
-        const fillLight = new THREE.PointLight(0xffffff, isMobile ? 0.05 : 0.1, 100);
+        // Optionally, add a subtle fill to avoid total black shadows
+        const fillLight = new THREE.PointLight(0xffffff, 0.1, 100);
         fillLight.position.set(0, 10, 0);
         lightGroup.add(fillLight);
 
@@ -188,14 +183,12 @@ class OptimizedThreeJSLoader {
     }
 
     isPostProcessingAvailable() {
-        if (this.isMobile()) return false;
         return typeof THREE.EffectComposer !== 'undefined' &&
                typeof THREE.RenderPass !== 'undefined' &&
                typeof THREE.ShaderPass !== 'undefined';
     }
 
     setupPostProcessing() {
-        if (this.isMobile()) return; // Disable post-processing on mobile
         this.composer = new THREE.EffectComposer(this.renderer);
         this.renderPass = new THREE.RenderPass(this.scene, this.camera);
         this.composer.addPass(this.renderPass);
@@ -284,12 +277,6 @@ class OptimizedThreeJSLoader {
                 this.isVisible = entry.isIntersecting;
                 if (!this.isVisible && this.rafId) {
                     this.pauseAnimation();
-                    if (this.isMobile()) {
-                        this.disposeModel();
-                        if (this.renderer) {
-                            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
-                        }
-                    }
                 } else if (this.isVisible && !this.rafId) {
                     this.resumeAnimation();
                 }
@@ -324,12 +311,6 @@ class OptimizedThreeJSLoader {
     handleVisibilityChange() {
         if (document.hidden) {
             this.pauseAnimation();
-            if (this.isMobile()) {
-                this.disposeModel();
-                if (this.renderer) {
-                    this.renderer.forceContextLoss && this.renderer.forceContextLoss();
-                }
-            }
         } else {
             this.resumeAnimation();
         }
@@ -878,7 +859,6 @@ class OptimizedThreeJSLoader {
         console.log(`Buffer scroll height set to: ${vh}vh`);
     }
 
-    // --- MOBILE MEMORY OPTIMIZATION ---
     disposeModel() {
         if (this.model) {
             // Stop and reset all animation actions before disposing
@@ -902,42 +882,12 @@ class OptimizedThreeJSLoader {
                         child.material.dispose();
                     }
                 }
-                // Remove textures from memory
-                if (child.material && child.material.map) {
-                    child.material.map.dispose();
-                    child.material.map = null;
-                }
-                if (child.material && child.material.normalMap) {
-                    child.material.normalMap.dispose();
-                    child.material.normalMap = null;
-                }
-                if (child.material && child.material.roughnessMap) {
-                    child.material.roughnessMap.dispose();
-                    child.material.roughnessMap = null;
-                }
-                if (child.material && child.material.metalnessMap) {
-                    child.material.metalnessMap.dispose();
-                    child.material.metalnessMap = null;
-                }
-                if (child.material && child.material.bumpMap) {
-                    child.material.bumpMap.dispose();
-                    child.material.bumpMap = null;
-                }
-                if (child.material && child.material.emissiveMap) {
-                    child.material.emissiveMap.dispose();
-                    child.material.emissiveMap = null;
-                }
             });
             this.scene.remove(this.model);
             this.model = null;
-            // Force GC hint for mobile browsers
-            if (this.isMobile() && window.gc) {
-                window.gc();
-            }
         }
     }
 
-    // --- MOBILE RENDERER MEMORY OPTIMIZATION ---
     dispose() {
         this.pauseAnimation();
         window.removeEventListener('scroll', this.throttledScroll);
@@ -948,70 +898,41 @@ class OptimizedThreeJSLoader {
         }
         this.disposeModel();
         if (this.renderer) {
-            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
             this.renderer.dispose();
-            this.renderer.domElement = null;
-            this.renderer = null;
         }
         if (this.composer) {
             this.composer.dispose();
-            this.composer = null;
         }
         this.scene = null;
         this.camera = null;
+        this.renderer = null;
         this.controls = null;
-        // Remove canvas from DOM
-        if (this.canvasContainer && this.canvasContainer.parentNode) {
-            this.canvasContainer.parentNode.removeChild(this.canvasContainer);
-        }
-        // Force GC hint for mobile browsers
-        if (this.isMobile() && window.gc) {
-            window.gc();
-        }
         console.log('Three.js loader disposed');
     }
 
-    // --- MOBILE: AGGRESSIVE CLEANUP ON VISIBILITY CHANGE ---
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.pauseAnimation();
-            if (this.isMobile()) {
-                this.disposeModel();
-                if (this.renderer) {
-                    this.renderer.forceContextLoss && this.renderer.forceContextLoss();
-                }
-            }
-        } else {
-            this.resumeAnimation();
-        }
+    getPerformanceInfo() {
+        if (!this.renderer) return null;
+        return {
+            render: this.renderer.info.render,
+            memory: this.renderer.info.memory,
+            fps: this.getFPS()
+        };
     }
 
-    // --- MOBILE: AGGRESSIVE CLEANUP ON SCROLL OUT OF VIEW ---
-    setupIntersectionObserver() {
-        const options = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0
-        };
-        this.intersectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                this.isVisible = entry.isIntersecting;
-                if (!this.isVisible && this.rafId) {
-                    this.pauseAnimation();
-                    if (this.isMobile()) {
-                        this.disposeModel();
-                        if (this.renderer) {
-                            this.renderer.forceContextLoss && this.renderer.forceContextLoss();
-                        }
-                    }
-                } else if (this.isVisible && !this.rafId) {
-                    this.resumeAnimation();
-                }
-            });
-        }, options);
-        if (this.canvasContainer) {
-            this.intersectionObserver.observe(this.canvasContainer);
+    getFPS() {
+        if (!this.fpsCounter) {
+            this.fpsCounter = { frames: 0, time: Date.now() };
         }
+        this.fpsCounter.frames++;
+        const now = Date.now();
+        const delta = now - this.fpsCounter.time;
+        if (delta >= 1000) {
+            const fps = Math.round((this.fpsCounter.frames * 1000) / delta);
+            this.fpsCounter.frames = 0;
+            this.fpsCounter.time = now;
+            return fps;
+        }
+        return null;
     }
 }
 
