@@ -60,3 +60,8 @@
   font-family: "Widebody";
   src: url('fonts/WB/Widebody.woff2');
 }
+
+@font-face {
+  font-family: "Xshow";
+  src: url(fonts/XS/Xshow.otf) format('opentype');
+}

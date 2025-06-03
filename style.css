@@ -1,0 +1,408 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+ html{
+    margin: 0;
+    padding: 0;
+}
+
+ body{
+    background-color: #eeeeee;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+ .fullscreen{
+    width: 100dvw;
+    height: 100dvh;
+}
+
+ .border{
+    box-shadow: inset 0 0 0 4px #000;
+}
+
+.drop-in #logo {
+  position: absolute;
+  top: 2.5dvh;
+  left: 50%;
+  transform: translateX(-50%) rotate(-10deg);
+  width: 10dvw;
+  filter: brightness(0);
+}
+
+ .drop-in{
+    padding: 0;
+    overflow-y: hidden;
+    position: relative;
+}
+
+ .drop-in-title{
+    font-family: "HKGroteskWide", sans-serif;
+    font-size: clamp(40px, 15vw, 250px);
+    overflow: hidden;
+    height: 100%;
+    padding-top: 0;
+    position: absolute;
+    line-height: 55%;
+    padding-left: 5dvw;
+    max-width: 90dvw;
+    -webkit-text-stroke: 2px #eeeeee;
+    text-align: center;
+}
+
+ .drop-in-title span {
+    font-family: "XShow", sans-serif;
+    font-weight: 100;
+    background: linear-gradient(145deg, #ff512f, #dd2476, #61045f);
+    -webkit-text-stroke: 2px transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0 25px; 
+    margin: 0 -25px; 
+}
+
+ .about {
+    max-width: 100dvw;
+    margin: 0 auto;
+    height: 100dvh;
+    border: 4px solid #000;
+    background: eeeeee;
+    position: relative;
+}
+
+ .aboutusContent {
+    background: #eeeeee;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    height: 80dvh;
+    padding-right: 280px; /* Make space for carousel */
+}
+
+ .aboutusContent h2 {
+    font-size: clamp(60px, 8vw, 120px);
+    font-weight: bold;
+    margin-bottom: 0;
+    line-height: 1.1;
+    flex-shrink: 0;
+    font-family: "HKGroteskWide", sans-serif;
+    margin-bottom: 10dvh;
+    max-width: 50dvw;
+}
+
+ .aboutusContent .text-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Montserrat", sans-serif;
+}
+
+ .aboutusContent p {
+    font-size: clamp(1rem, 2.5vw, 1.8rem);
+    line-height: 1;
+    color: #333;
+    margin: 0 0 0.25em 0; /* Reduced bottom margin for less gap */
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    max-width: 50dvw;
+}
+
+ .devCarousel {
+    position: absolute;
+    top: -4px;
+    right: 17.5px;
+    width: 35dvw;
+    height: 50dvh;
+    background: #eeeeee;
+    border: 4px solid #000;
+    overflow: hidden;
+}
+
+ .funnyCircle {
+    position: absolute;
+    bottom: -4px;
+    right: 17.5px;
+    width: 35dvw;
+    height: 50dvh;
+    background: #eeeeee;
+    border: 4px solid #000;
+    overflow: hidden;
+}
+
+ .carousel-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+ .dev-card {
+    position: absolute;
+    background: #eeeeee;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+ .dev-card.active {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+ .dev-card.exit {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+ .dev-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    margin: 0 auto 10px;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+ .dev-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+ .dev-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #000;
+    font-family: "HKGroteskWide", sans-serif;
+    text-transform: uppercase;
+}
+
+ .dev-description {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.3;
+    font-family: "Montserrat", sans-serif;
+}
+
+ .dev-socials {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+ .social-link {
+    padding: 4px 8px;
+    background: #000;
+    color: #eeeeee;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 10px;
+    transition: all 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+}
+
+ .social-link:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
+ .carousel-nav {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+}
+
+ .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #000;
+}
+
+ .nav-dot.active {
+    background: #000;
+}
+
+ .carousel-arrows {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+    padding: 6px 6px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #000;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+ .carousel-arrows:hover {
+    background: #000;
+    color: eeeeee;
+}
+
+ .prev-arrow {
+    left: 5px;
+}
+
+ .next-arrow {
+    right: 5px;
+}
+
+ .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+ @media (max-width: 768px) {
+    .about {
+        height: auto;
+        min-height: 60vh;
+    }
+
+     .aboutusContent {
+        padding: 30px 20px;
+        padding-right: 20px;
+    }
+
+     .devCarousel {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        height: 200px;
+        margin-top: 20px;
+        border-radius: 8px;
+    }
+
+     .aboutusContent h2 {
+        font-size: 2.5rem;
+    }
+}
+
+
+  .games {
+    max-width: 100dvw;
+    margin: 0 auto;
+    height: 100dvh;
+    border: 4px solid #000;
+    background: eeeeee;
+    position: relative;
+}
+
+ .gamesContent {
+    background: #eeeeee;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    height: 80dvh;
+    padding-right: 280px; /* Make space for carousel */
+}
+
+ .gamesContent h2 {
+    font-size: clamp(60px, 8vw, 120px);
+    font-weight: bold;
+    margin-bottom: 0;
+    line-height: 1.1;
+    flex-shrink: 0;
+    font-family: "HKGroteskWide", sans-serif;
+    margin-bottom: 10dvh;
+    max-width: 50dvw;
+}
+
+ .gamesContent .text-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Montserrat", sans-serif;
+}
+
+ .gamesContent p {
+    font-size: clamp(1rem, 2.5vw, 1.8rem);
+    line-height: 1;
+    color: #333;
+    margin: 0 0 0.25em 0; /* Reduced bottom margin for less gap */
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    max-width: 50dvw;
+}
+
+
+
+ #overheat {
+    position: absolute;
+    top: -4px;
+    right: 17.5px;
+    width: 35dvw;
+    height: 50dvh;
+    background: #eeeeee;
+    border: 4px solid #000;
+    overflow: hidden;
+}
+
+ #ufg {
+    position: absolute;
+    bottom: -4px;
+    right: 17.5px;
+    width: 35dvw;
+    height: 50dvh;
+    background: #eeeeee;
+    border: 4px solid #000;
+    overflow: hidden;
+}
+
+ #overheat,#ufg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+#overheat > p, #ufg > p{
+    font-family: 'HKGroteskWide', sans-serif;
+    display: none;
+} 
+
+ .games img {
+    filter: brightness(0);
+    max-width: 100%;
+    max-height: 90%;
+}
+
