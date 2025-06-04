@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     const emailData = {
       sender: {
         name: "Contact Form",
-        email: "noreply@yourdomain.com" // Use your verified domain
+        email: "fordonthego2008@yahoo.com" // Use your verified domain
       },
       to: [
         {
