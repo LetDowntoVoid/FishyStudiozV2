@@ -40,6 +40,56 @@
         <div class="funnyCircle"></div>
     </div>
 
+    <div class="contact fullscreen">
+        <div class="contactContent">
+            <h2 class="text_offscreen" data-text="SO, HELLO!">SO, HELLO!</h2>
+            <p>Let's connect or drop a mail at <b>fishystudioz@protonmail.com</b></p>
+            <div id="toggle-form-type" class="toggle-form-type">
+                I want a normal form
+            </div>
+        </div>
+        <div class="form">
+            <div class="textbubbles" id="chat-bubbles">
+                <div class="bubble visible" data-step="name">
+                    Hey, my name is <input class="bubble-input inline" type="text" placeholder="your name" id="name-input" autocomplete="off">
+                </div>
+                <!-- The following bubbles will be shown by JS -->
+                <div class="bubble" data-step="email" style="display:none;">
+                    My email is <input class="bubble-input inline" type="email" placeholder="your@email.com" id="email-input" autocomplete="off">
+                </div>
+                <div class="bubble" data-step="subject" style="display:none;">
+                    I want to <input class="bubble-input inline" type="text" placeholder="your wish" id="subject-input" autocomplete="off">
+                </div>
+                <div class="bubble textarea-bubble" data-step="message" style="display:none;" id="bigTextBox">
+                    <textarea class="bubble-input textarea" placeholder="Tell us more..." rows="1" id="message-input"></textarea>
+                </div>
+                <button id="send-btn" style="display:none;" class="bubble-send-btn">Send</button>
+            </div>
+            <img src="src/noob.png" alt="Noob Image" />
+        </div>
+
+        <form id="normal-form" style="display:none; margin-top:24px; width:100%; max-width:600px;">
+            <div class="normal-form-row">
+                <div class="normal-form-group">
+                    <label for="normal-name">NAME</label>
+                    <input type="text" id="normal-name" name="name" autocomplete="off">
+                </div>
+                <div class="normal-form-group">
+                    <label for="normal-email">EMAIL</label>
+                    <input type="email" id="normal-email" name="email" autocomplete="off">
+                </div>
+            </div>
+            <div class="normal-form-group">
+                <label for="normal-subject">SUBJECT</label>
+                <input type="text" id="normal-subject" name="subject" autocomplete="off">
+            </div>
+            <div class="normal-form-group">
+                <label for="normal-message">MESSAGE</label>
+                <textarea id="normal-message" name="message" rows="3"></textarea>
+            </div>
+            <button type="submit" class="normal-send-btn">SEND</button>
+        </form>
+    </div>
     
     <script src="script.js"></script>
 </body>

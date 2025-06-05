@@ -713,4 +713,139 @@ async function test() {
     const result = await sendEmail(testData);
     console.log(result);
 }
-test();
+//test();
+
+// Auto-grow textarea
+document.querySelectorAll('.bubble-input.textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        this.style.bottom = (this.scrollHeight) + 'px';
+        const form = this.closest('.form');
+        if (form) {
+            const rect = this.getBoundingClientRect();
+            if (rect.bottom > window.innerHeight) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const steps = [
+        { id: 'name-input', next: 'email' },
+        { id: 'email-input', next: 'subject', validate: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) },
+        { id: 'subject-input', next: 'message' },
+        { id: 'message-input', next: 'send-btn' }
+    ];
+
+    function showStep(step) {
+        const bubble = document.querySelector(`.bubble[data-step="${step}"]`);
+        if (bubble) {
+            bubble.style.display = '';
+            setTimeout(() => bubble.classList.add('visible'), 10);
+            const input = bubble.querySelector('input,textarea');
+            if (input) input.focus();
+            const form = bubble.closest('.form');
+            if (form) form.scrollTop = form.scrollHeight;
+        }
+        if (step === 'send-btn' || step === 'message') {
+            document.getElementById('send-btn').style.display = '';
+        }
+    }
+
+    steps.forEach((stepObj, idx) => {
+        const input = document.getElementById(stepObj.id);
+        if (!input) return;
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && stepObj.id !== 'message-input') {
+                e.preventDefault();
+                const value = this.value.trim();
+                if (stepObj.id === 'email-input' && stepObj.validate && !stepObj.validate(value)) {
+                    this.style.borderBottomColor = "#e53935";
+                    this.setCustomValidity("Please enter a valid email.");
+                    this.reportValidity();
+                    return;
+                }
+                this.style.borderBottomColor = "#bbb";
+                showStep(stepObj.next);
+            }
+        });
+        if (stepObj.id === 'email-input') {
+            input.addEventListener('input', function() {
+                const valid = steps[1].validate(this.value.trim());
+                this.style.borderBottomColor = valid ? "#4caf50" : "#e53935";
+            });
+        }
+    });
+
+    document.getElementById('send-btn').addEventListener('click', async function() {
+        const name = document.getElementById('name-input').value.trim();
+        const email = document.getElementById('email-input').value.trim();
+        const subject = document.getElementById('subject-input').value.trim();
+        const message = document.getElementById('message-input').value.trim();
+        if (!name || !email || !subject || !message) {
+            alert("Please fill out all fields.");
+            return;
+        }
+        if (!steps[1].validate(email)) {
+            alert("Please enter a valid email address.");
+            return;
+        }
+        const result = await sendEmail({ name, email, subject, message });
+        if (result.success) {
+            alert("Message sent successfully!");
+        } else {
+            alert("Failed to send message: " + (result.error || "Unknown error"));
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('toggle-form-type');
+    const funForm = document.querySelector('.form');
+    const normalForm = document.getElementById('normal-form');
+    let funMode = true;
+
+    toggle.addEventListener('click', () => {
+        funMode = !funMode;
+        if (funMode) {
+            funForm.style.display = '';
+            normalForm.style.display = 'none';
+            toggle.textContent = "I want a normal form";
+        } else {
+            funForm.style.display = 'none';
+            normalForm.style.display = '';
+            toggle.textContent = "I want the fun form";
+        }
+    });
+});
+
+document.getElementById('normal-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('normal-name').value.trim();
+    const email = document.getElementById('normal-email').value.trim();
+    const subject = document.getElementById('normal-subject').value.trim();
+    const message = document.getElementById('normal-message').value.trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (!name || !email || !subject || !message) {
+        alert("Please fill out all fields.");
+        return;
+    }
+    if (!emailValid) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+    const result = await sendEmail({ name, email, subject, message });
+    if (result.success) {
+        alert("Message sent successfully!");
+        this.reset();
+    } else {
+        alert("Failed to send message: " + (result.error || "Unknown error"));
+    }
+});
+
+
+
