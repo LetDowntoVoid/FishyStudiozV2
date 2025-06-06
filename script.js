@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             funForm.style.display = 'none';
             normalForm.style.display = '';
-            toggle.textContent = "I want the fun form";
+            toggle.textContent = "I want the fun form :[";
         }
     });
 });

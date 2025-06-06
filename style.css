@@ -724,7 +724,6 @@ body {
     max-width: 100dvw;
     margin: 0 auto;
     height: 100dvh;
-    border: 4px solid #000;
     background: #eeeeee;
     position: relative;
     display: flex;
@@ -922,10 +921,8 @@ body {
     text-align: left; /* align left */
     margin: 8px 0 0 0;
     color: #444;
-    text-decoration: underline;
     font-family: "Montserrat", sans-serif;
     font-size: 1em;
-    /* Make sure it lines up with the <p> tag */
     padding-left: 0;
 }
 .toggle-form-type:hover {
@@ -1014,6 +1011,9 @@ body {
 }
 
 @media (max-width: 900px) {
+    .border{
+        box-shadow: none;
+    }
     .contact {
         flex-direction: column;
         align-items: center;

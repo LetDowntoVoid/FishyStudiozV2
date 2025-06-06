@@ -9,9 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <!-- All loaders from same source -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-    <div class="drop-in force-fullscreen">
+    <div class="drop-in force-fullscreen" id="drop-in">
         <img id="logo" src="src/fishyHeader.png" />
         <h1 class="drop-in-title">Making games for the <i><span>art.</span></i></h1>
     </div>
@@ -92,5 +95,6 @@
     </div>
     
     <script src="script.js"></script>
+    <script src="funnyFishGuy.js"></script>
 </body>
 </html>
