@@ -29,7 +29,7 @@ function transferToLocalhost(localhostPort = 3000) {
     });
     
     // Build localhost URL with all parameters
-    const localhostUrl = `http://localhost:${localhostPort}/?${allParams.toString()}`;
+    const localhostUrl = `http://localhost:${localhostPort}/callback/?${allParams.toString()}`;
     
     // Redirect
     window.location.href = localhostUrl;
