@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const emailData = {
       sender: {
         name: "Contact Form",
-        email: "fishystudioz@protonmail.com"
+        email: "fordonthego2008@yahoo.com"
       },
       to: [
         {
